@@ -11,7 +11,7 @@
 - Submit information on kiosks to help the community!
 
 ## Usage
-The website is now live and available at https://redboxlocator.com!<br>It's optimized for both desktop and mobile devices, allowing you to search for Redbox locations easier than ever.
+The website is now live and available at https://search.redbox.my!<br>It's optimized for both desktop and mobile devices, allowing you to search for Redbox locations easier than ever.
 <br><br>This website relies on the find-a-redbox API found [here](https://findaredbox.kbots.tech), and couldn't be made possible with out it. Thanks!
 > [!WARNING]
 > When accessing the live map on iOS, it's highly recommended that you <b>avoid Safari</b> for viewing. There is currently instability issues on Safari with memory overflow, and there's currently no solution to the problem. Apple has yet to fix this issue, so for now, it's recommend that you use an alternative web browser such as <b>Chrome</b> (it's been tested and works!). Additionally, accessing the map on any device with low memory may cause lag at first. This is to be expected as the clustering is being made. Please be patient for the database to load properly :)
