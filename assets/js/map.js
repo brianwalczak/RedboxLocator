@@ -11,7 +11,7 @@ var geolocateControl;
 window.duplicates = [];
 window.cache = [];
 
-const ACCESS_TOKEN = 'pk.eyJ1IjoiYnJpYW53YWxjemFrIiwiYSI6ImNtN3Y5OWFuOTA4bzgyc3B0OWlyajBiemoifQ.zWZG8bzqHAH8__h-ay62Xw';
+const ACCESS_TOKEN = 'pk.eyJ1IjoiYnJpYW53YWxjemFrIiwiYSI6ImNtNXE2ZXJzZzA4emIyanExdmI0MGZhYW4ifQ.58j41e6A78-4Md1B0EJ5FQ';
 const ZOOM_THRESHOLD = 11;
 // Warning: if anybody is planning to use this, you literally can't do anything with this token... it's meant to be public lol
 // You won't be able to use it on any other site, so don't even try it.
