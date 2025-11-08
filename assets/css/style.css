@@ -14,16 +14,32 @@ html, body {
     display: flex;
     flex-direction: column;
     height: 100%;
+    background: rgb(17, 17, 17);
+    color: white;
 }
 
 .header {
     display: flex;
-    justify-content: flex-start;
+    justify-content: flex-end;
+    align-items: center;
     gap: 10px;
     padding: 10px;
     position: relative;
     z-index: 20;
     pointer-events: none;
+}
+
+.header .toggle {
+    cursor: pointer;
+    font-size: 25px;
+    user-select: none;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    width: 34px;
+    height: 34px;
+    pointer-events: auto;
+    font-family: 'Material Symbols Outlined';
 }
 
 button {
@@ -46,6 +62,9 @@ select, input, textarea {
     font-weight: 700;
     border-radius: 5px;
     padding-right: 20px;
+    color: #ffffff;
+    border: 2px solid #555555;
+    background-color: #333333;
 }
 
 select, select option {
@@ -80,6 +99,12 @@ select, select option {
     font-size: 1rem;
     display: flex;
     flex-direction: column;
+    background: rgb(17, 17, 17);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0)), rgb(17, 17, 17);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    color: white;
 }
 
 .popup .option {
@@ -147,6 +172,7 @@ span.view_duplicates {
   top: 0; left: 0; right: 0; bottom: 0;
   border-radius: 24px;
   transition: 300ms;
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .popup .switch :before {
@@ -158,10 +184,15 @@ span.view_duplicates {
   bottom: 3px;
   border-radius: 50%;
   transition: 300ms;
+  background: #dddddd;
 }
 
 .popup .switch input:checked + .slider:before {
   transform: translateX(20px);
+}
+
+.popup .switch input:checked + .slider {
+  background: rgb(227, 28, 35);
 }
 
 #map {
@@ -223,6 +254,7 @@ span.view_duplicates {
 .cluster span {
     line-height: 30px;
     font-weight: 700;
+    color: rgb(17, 17, 17);
 }
 
 .mapboxgl-popup {

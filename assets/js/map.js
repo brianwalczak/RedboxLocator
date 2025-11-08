@@ -23,8 +23,6 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 // Creates the map and all of its features
 function spawnMapInstance() {
     return new Promise((resolve, reject) => {
-        let mapTheme = settings.theme();
-
         if (map && geolocateControl) {
             return resolve(true);
         }
@@ -32,15 +30,9 @@ function spawnMapInstance() {
         console.warn('A map request has been called, creating a new map instance with Mapbox GL JS.\nWarning: You WILL be charged for Mapbox API requests!');
         mapboxgl.accessToken = ACCESS_TOKEN;
 
-        if (mapTheme == 'light') {
-            mapTheme = 'mapbox://styles/mapbox/light-v11'
-        } else if (mapTheme == 'dark') {
-            mapTheme = 'mapbox://styles/mapbox/dark-v11'
-        }
-
         map = new mapboxgl.Map({
             container: 'map',
-            style: mapTheme,
+            style: 'mapbox://styles/mapbox/standard',
             center: [-98.5795, 39.8283],
             zoom: 4,
             failIfMajorPerformanceCaveat: false

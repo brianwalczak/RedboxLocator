@@ -63,24 +63,8 @@ const settings = {
         return result;
     },
 
-    // get or set the theme
-    theme: function (value) {
-        let theme = settings.get('theme');
-        if (!theme && !value) {
-            settings.set('theme', 'dark'); // default to dark theme
-            theme = 'dark';
-        } else if (value) {
-            settings.set('theme', value);
-            theme = value;
-        }
-
-        $('body').removeClass('lightMode darkMode').addClass(theme == 'light' ? 'lightMode' : 'darkMode');
-        return theme;
-    },
-
     // get the correct color for a status
     color: function (status, type) {
-        let theme = settings.theme();
         let markerColor;
         let textColor;
 
@@ -94,7 +78,7 @@ const settings = {
                 textColor = '#FFC107';
                 break;
             case 'Removed':
-                markerColor = theme == 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)';
+                markerColor = 'rgba(0, 0, 0, 0.3)';
                 textColor = 'red';
                 break;
             case 'Error (See notes for error code)':
@@ -102,7 +86,7 @@ const settings = {
                 textColor = 'red';
                 break;
             case 'Never Existed':
-                markerColor = theme == 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)';
+                markerColor = 'rgba(0, 0, 0, 0.3)';
                 textColor = 'red';
                 break;
         }
@@ -111,13 +95,23 @@ const settings = {
     }
 };
 
-// swap the themes to the opposite (used for the theme toggle)
-settings.theme.swap = function () {
-    if ($('body').hasClass('lightMode')) {
-        settings.theme('dark');
-        return location.reload();
-    } else if ($('body').hasClass('darkMode')) {
-        settings.theme('light');
-        return location.reload();
+function viewSettings() {
+    $('#settingsModal').show();
+    $('#settingsModal').addClass('show');
+
+    $('#showUnknownDate').prop('checked', !!settings.get('showUnknownDate'));
+}
+
+async function closeSettings() {
+    $('#settingsModal').removeClass('show');
+    await sleep(300); // wait for the transition to finish
+    $('#settingsModal').hide();
+}
+
+$(document).on('change', '#showUnknownDate', function() {
+    settings.set('showUnknownDate', this.checked);
+
+    if (map) {
+        map.setFilter('storeLayer', this.checked ? null : ['!=', ['get', 'openDate'], 'Unknown']);
     }
-};
+});
