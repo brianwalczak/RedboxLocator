@@ -44,6 +44,10 @@ $(document).ready(function () {
         }
 
         const searchResults = map.getSource('storeSource')._data.features.filter(feature => {
+            if (feature.properties.openDate === 'Unknown' && !settings.get('showUnknownDate')) {
+                return false;
+            }
+
             if (feature.properties.bannerName.toLowerCase().includes($('.search-input').val().toLowerCase())) {
                 return true;
             }

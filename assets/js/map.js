@@ -105,43 +105,6 @@ function spawnMapInstance() {
     });
 }
 
-// Updates the clusters on the map
-let zoomedInStores = new Set();
-
-function updateClusters() {
-    const zoom = map.getZoom();
-
-    if (zoom < ZOOM_THRESHOLD) {
-        // Remove all stores if zoomed out too far
-        zoomedInStores.forEach(storeId => {
-            map.setFeatureState({ source: 'storeSource', id: storeId }, { color: null });
-        });
-        zoomedInStores.clear();
-        return;
-    }
-
-    const features = map.queryRenderedFeatures({ layers: ['storeLayer'] });
-    const storeIds = new Set(features.map(feature => feature.id));
-
-    // Add any stores that are in view
-    features.forEach(store => {
-        try {
-            const cache = window.cache[store.id];
-
-            map.setFeatureState({ source: 'storeSource', id: store.id }, { color: settings.color(cache.status, 'marker') });
-            zoomedInStores.add(store.id);
-        } catch (error) { }
-    });
-
-    // Remove any stores that are no longer in view
-    zoomedInStores.forEach(storeId => {
-        if (!storeIds.has(storeId)) {
-            map.setFeatureState({ source: 'storeSource', id: storeId }, { color: null });
-            zoomedInStores.delete(storeId);
-        }
-    });
-}
-
 // Serves the popup for a store location (creates it)
 async function servePopup(e) {
     const feature = e.features[0];
@@ -202,6 +165,7 @@ async function downloadClusters() {
                 id: 'storeLayer',
                 type: 'circle',
                 source: 'storeSource',
+                filter: (settings.get('showUnknownDate') ? null : ['!=', ['get', 'openDate'], 'Unknown']),
                 paint: {
                     'circle-radius': [
                         'interpolate',
@@ -211,7 +175,7 @@ async function downloadClusters() {
                         15, 12, // At zoom level 15, radius is 12
                         20, 24  // At zoom level 20, radius is 24
                     ],
-                    'circle-color': ['coalesce', ['feature-state', 'color'], settings.color('Operational', 'marker')] // default color is for operational
+                    'circle-color': ['coalesce',  ['feature-state', 'color'], ['get', 'color'], settings.color('Operational', 'marker')] // prioritize feature changes, otherwise use default from geojson, otherwise use Operational
                 }
             });
 
@@ -238,12 +202,6 @@ async function downloadClusters() {
 
                 return servePopup(e); // show popup if zoomed in enough
             });
-
-            map.on('move', updateClusters);
-            map.on('zoom', updateClusters);
-            map.on('zoomend', updateClusters);
-            map.on('moveend', updateClusters);
-            updateClusters();
 
             worker.terminate(); // clean up the worker after we're done with it
         };

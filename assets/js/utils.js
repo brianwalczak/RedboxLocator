@@ -40,7 +40,11 @@ function searchDuplicates(lng, lat) {
   let matchingEntries = [];
 
   window.duplicates.forEach(duplicate => {
-    const { lng: dLng, lat: dLat } = duplicate.properties;
+    const { lng: dLng, lat: dLat, openDate } = duplicate.properties;
+
+    if (openDate === 'Unknown' && !settings.get('showUnknownDate')) {
+      return false;
+    }
 
     if (Number(lng) == Number(dLng) && Number(lat) == Number(dLat)) {
       matchingEntries.push(duplicate);
@@ -64,7 +68,7 @@ async function getStoreData(storeId) {
 let ipCache = null;
 async function getIPLocation() {
   if (ipCache) return ipCache;
-  
+
   try {
     const req = await fetch("https://ipinfo.io/json");
     const res = await req.json();
