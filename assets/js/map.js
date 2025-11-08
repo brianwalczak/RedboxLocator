@@ -166,6 +166,13 @@ async function downloadClusters() {
                 type: 'circle',
                 source: 'storeSource',
                 filter: (settings.get('showUnknownDate') ? null : ['!=', ['get', 'openDate'], 'Unknown']),
+                layout: {
+                    'circle-sort-key': [
+                        'case',
+                        ...settings.prioritize(),
+                        0
+                    ]
+                },
                 paint: {
                     'circle-radius': [
                         'interpolate',

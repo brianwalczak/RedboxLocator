@@ -89,8 +89,21 @@ const settings = {
                 markerColor = 'darkgrey';
                 textColor = 'red';
                 break;
+            case 'Unconfirmed':
+                markerColor = 'darkgrey';
+                textColor = 'darkgrey';
+                break;
         }
 
         return type == 'marker' ? markerColor : type == 'text' ? textColor : { marker: markerColor, text: textColor };
+    },
+
+    prioritize: function () {
+        return [
+            ['==', ['get', 'color'], this.color('Operational', 'marker')], 4,
+            ['==', ['get', 'color'], this.color('Turned Off', 'marker')], 3,
+            ['==', ['get', 'color'], this.color('Removed', 'marker')], 2,
+            ['==', ['get', 'color'], this.color('Unconfirmed', 'marker')], 1,
+        ]
     }
 };

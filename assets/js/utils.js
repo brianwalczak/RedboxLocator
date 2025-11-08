@@ -59,7 +59,7 @@ async function getStoreData(storeId) {
   const req = await fetch("https://findaredbox.kbots.tech/search/?id=" + storeId);
   const res = await req.json();
 
-  window.cache[storeId] = { status: res[0].status, notes: res[0].notes }; // updated cache to include latest data
+  window.cache[storeId] = { status: ((res[0].status === 'Operational' && !res[0].notes) ? 'Unconfirmed' : res[0].status), notes: res[0].notes }; // updated cache to include latest data
   actions.propogateChanges(storeId); // update the marker on the map, and any active popup (if it exists)
   return res[0];
 }

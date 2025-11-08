@@ -159,7 +159,7 @@ const actions = {
                     <p style="margin-top:0;line-height:24px">Please select the issue you experienced with this kiosk below, and add an additional note if needed.</p>
                     <select class=status>
                         <option value="Operational">Operational</option>
-                        <option value="Turned Off" selected>Turned Off</option>
+                        <option value="Turned Off">Turned Off</option>
                         <option value="Removed">Removed</option>
                         <option value="Error (See notes for error code)">Error (please clarify)</option>
                         <option value="Never Existed">Never Existed</option>
@@ -172,9 +172,7 @@ const actions = {
                 </div>
             `);
 
-            if (oldData.status !== "Operational") {
-                popup.find('.status').val(oldData.status); // set the default option to the previous status
-            }
+            popup.find('.status').val(oldData.status === 'Unconfirmed' ? 'Operational' : oldData.status); // set the default option to the previous status
 
             // submit the feedback when they fill out the form
             popup.find('.submit').click(async function () {
