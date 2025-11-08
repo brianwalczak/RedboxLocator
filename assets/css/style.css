@@ -306,6 +306,10 @@ span.view_duplicates {
     display: none !important; /* remove default geolocate button */
 }
 
+.mapboxgl-ctrl-logo {
+    display: none !important; /* remove mapbox logo */
+}
+
 .geolocate-btn {
     position: absolute;
     bottom: 20px;
