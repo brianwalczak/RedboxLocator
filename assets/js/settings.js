@@ -70,23 +70,23 @@ const settings = {
 
         switch (status) {
             case 'Operational':
-                markerColor = 'rgb(227, 28, 35)';
+                markerColor = 'green';
                 textColor = 'green';
                 break;
             case 'Turned Off':
-                markerColor = 'rgba(255, 193, 7, 0.6)';
+                markerColor = 'rgb(255, 193, 7)';
                 textColor = '#FFC107';
                 break;
             case 'Removed':
-                markerColor = 'rgba(0, 0, 0, 0.3)';
+                markerColor = 'rgb(227, 28, 35)';
                 textColor = 'red';
                 break;
             case 'Error (See notes for error code)':
-                markerColor = 'rgba(255, 193, 7, 0.6)';
+                markerColor = 'rgb(255, 193, 7)';
                 textColor = 'red';
                 break;
             case 'Never Existed':
-                markerColor = 'rgba(0, 0, 0, 0.3)';
+                markerColor = 'darkgrey';
                 textColor = 'red';
                 break;
         }
