@@ -94,24 +94,3 @@ const settings = {
         return type == 'marker' ? markerColor : type == 'text' ? textColor : { marker: markerColor, text: textColor };
     }
 };
-
-function viewSettings() {
-    $('#settingsModal').show();
-    $('#settingsModal').addClass('show');
-
-    $('#showUnknownDate').prop('checked', !!settings.get('showUnknownDate'));
-}
-
-async function closeSettings() {
-    $('#settingsModal').removeClass('show');
-    await sleep(300); // wait for the transition to finish
-    $('#settingsModal').hide();
-}
-
-$(document).on('change', '#showUnknownDate', function() {
-    settings.set('showUnknownDate', this.checked);
-
-    if (map) {
-        map.setFilter('storeLayer', this.checked ? null : ['!=', ['get', 'openDate'], 'Unknown']);
-    }
-});

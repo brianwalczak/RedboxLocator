@@ -143,3 +143,24 @@ async function fadeOutOpacity(selector, duration = 200) {
   selector.css("visibility", "hidden");
   selector.css("transition", oldTransition);
 }
+
+function viewSettings() {
+    $('#settingsModal').show();
+    $('#settingsModal').addClass('show');
+
+    $('#showUnknownDate').prop('checked', !!settings.get('showUnknownDate'));
+}
+
+async function closeSettings() {
+    $('#settingsModal').removeClass('show');
+    await sleep(300); // wait for the transition to finish
+    $('#settingsModal').hide();
+}
+
+$(document).on('change', '#showUnknownDate', function() {
+    settings.set('showUnknownDate', this.checked);
+
+    if (map) {
+        map.setFilter('storeLayer', this.checked ? null : ['!=', ['get', 'openDate'], 'Unknown']);
+    }
+});

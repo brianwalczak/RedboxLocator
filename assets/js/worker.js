@@ -6,6 +6,8 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+importScripts('/assets/js/settings.js');
+
 // Creates GeoJSON features from store data
 function createGeoJSON(stores) {
     const featuresMap = new Map(); // used to prevent duplicate coordinates
@@ -25,6 +27,7 @@ function createGeoJSON(stores) {
                 bannerName: kiosk.banner_name || 'Unknown',
                 address: kiosk.address,
                 openDate: kiosk.open_date ? new Date(kiosk.open_date).toLocaleDateString() : 'Unknown',
+                color: settings.color(kiosk.status || 'Operational', 'marker'),
 
                 // we need to make a deep copy since geometry changes over time based on map movement
                 lng: parseFloat(kiosk.lon),
