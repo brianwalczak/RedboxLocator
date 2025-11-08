@@ -84,8 +84,14 @@ async function getIPLocation() {
 async function submitFeedback(storeId, status, notes = null) {
   if (notes == null) {
     const oldData = await getStoreData(storeId);
-
     notes = oldData.notes;
+  }
+
+  // cross compatibility with Rbmap :D
+  if (status === "Operational" && (!notes || notes.trim() === "")) { // if operational with no notes (also means no tag)
+    notes = "\n!!!RBConfirmedOperational!!!"; // add confirmed operational tag
+  } else if (notes.replace("\n!!!RBConfirmedOperational!!!", "").trim().length > 0) { // if there are already other notes
+    notes = notes.replace("\n!!!RBConfirmedOperational!!!", "").trim(); // remove confirmed operational tag if it exists
   }
 
   const req = await fetch("https://findaredbox.kbots.tech/update", {

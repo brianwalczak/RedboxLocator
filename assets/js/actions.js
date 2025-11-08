@@ -22,10 +22,11 @@ const actions = {
         try {
             const popupEl = $('.mapboxgl-popup');
             map.setFeatureState({ source: 'storeSource', id: storeId }, { color: settings.color(updatedData.status, 'marker') }); // update the marker color
+            let notes = updatedData?.notes?.replace("\n!!!RBConfirmedOperational!!!", "") || null;
 
             if (popupEl && popupEl.attr('data-id') === storeId) { // if the popup is open, update the status and notes
                 $(popupEl).find('.status').text(updatedData.status);
-                $(popupEl).find('.notes').html(updatedData.notes ? `<b>Notes: </b>${updatedData.notes}<br><br>` : '');
+                $(popupEl).find('.notes').html(notes ? `<b>Notes: </b>${notes}<br><br>` : '');
 
                 $(popupEl).find('.status').css('color', settings.color(updatedData.status, 'text')); // change the text color to match the status color
             }
@@ -163,7 +164,7 @@ const actions = {
                         <option value="Error (See notes for error code)">Error (please clarify)</option>
                         <option value="Never Existed">Never Existed</option>
                     </select>
-                    <textarea class=notes placeholder="Additional notes..." style="margin-top: 10px; width: 75%; resize: none;">${oldData.notes || ''}</textarea>
+                    <textarea class=notes placeholder="Additional notes..." style="margin-top: 10px; width: 75%; resize: none;">${oldData?.notes?.replace("\n!!!RBConfirmedOperational!!!", "") || ''}</textarea>
                     <div class="option">
                         <button class="cancel" style="background:#333;margin-right:10px">Cancel</button>
                         <button class="submit">Submit</button>
