@@ -13,7 +13,7 @@ function createGeoJSON(stores) {
 
     stores.forEach(kiosk => {
         const coordsKey = `${kiosk.lon},${kiosk.lat}`;
-        
+
         const newFeature = {
             type: "Feature",
             geometry: {
@@ -34,16 +34,16 @@ function createGeoJSON(stores) {
 
         if (featuresMap.has(coordsKey)) {
             const existing = featuresMap.get(coordsKey); // get the already-existing one
-            
+
             // Prefer the address with longer length (obv may not be good enough but it's the best we can do, we want the most detailed!)
             if (newFeature.properties.address.length > existing.properties.address.length) {
                 // Merge the two items into one (merge values if one includes data the other doesn't)
-                if(existing.properties.openDate !== 'Unknown') {
+                if (existing.properties.openDate !== 'Unknown') {
                     newFeature.properties.openDate = existing.properties.openDate;
                     newFeature.properties.isMerged = true;
                 }
 
-                if(existing.properties.bannerName !== 'Unknown') {
+                if (existing.properties.bannerName !== 'Unknown') {
                     newFeature.properties.bannerName = existing.properties.bannerName;
                     newFeature.properties.isMerged = true;
                 }
@@ -62,14 +62,14 @@ function createGeoJSON(stores) {
     return { result: Array.from(featuresMap.values()), duplicates };
 }
 
-self.onmessage = async function(event) {
+self.onmessage = async function (event) {
     try {
         const response = await fetch('https://findaredbox.kbots.tech/search');
-        
+
         if (!response.ok) {
             return self.postMessage({ error: response.statusText });
         }
-        
+
         const stores = await response.json();
         const geoJSON = createGeoJSON(stores);
 

@@ -51,43 +51,6 @@
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://search.redbox.my/" />
     <meta property="og:site_name" content="Redbox Locator | Redbox.my" />
-    <style>
-        html,
-        body {
-            overflow: hidden !important;
-        }
-
-        #start .title {
-            font-weight: 800;
-            font-size: 35px;
-        }
-
-        #start .desc {
-            font-size: 16px;
-            margin-top: -15px;
-            padding: 0px 20px;
-        }
-
-        .stateBtn {
-            background-color: #e50813;
-            padding: 8px 20px;
-            margin-top: 10px;
-        }
-
-        .stateBtn:disabled {
-            background-color: #b50711;
-            cursor: not-allowed;
-        }
-
-        .locationBtn {
-            background-color: #1F51FF;
-        }
-
-        .locationBtn:disabled {
-            background-color: #0e3dcb;
-            cursor: not-allowed;
-        }
-    </style>
 
     <script src="https://unpkg.com/supercluster/dist/supercluster.min.js"></script>
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet" />
@@ -98,27 +61,11 @@
 <body>
     <div class="header">
         <div id="color" class="toggle" onclick="settings.theme.swap()"></div>
-        <div id="settings" class="toggle" onclick="updateSettings()" style="display: none;">settings</div>
     </div>
     <div class="search-container" style="display: none;">
         <span class="search-icon material-icons">search</span>
         <input type="text" class="search-input" placeholder="Search">
         <span class="close-icon material-icons">close</span>
-    </div>
-
-    <div id="start" style="display: none;">
-        <h1 class="title">Redbox Locator</h1>
-        <p class="desc" style="margin-top: -15px;"></p><br>
-        <button onclick="actions.useCurrentLocation()" class="locationBtn">Use Current Location</button>
-
-        <div class="divider">OR</div>
-        <form>
-            <select id="stateList" name="state">
-                <!-- states will be added in init.js -->
-            </select>
-        </form>
-
-        <button onclick="actions.zoomToState()" class="stateBtn">Choose State</button>
     </div>
 
     <div id="map" style="opacity: 0; visibility: hidden;"></div>
@@ -129,11 +76,11 @@
         <div class="locations"></div>
     </div>
 
-    <script type="text/javascript" src="assets/js/settings.js"></script> <!-- Settings configuration -->
-    <script type="text/javascript" src="assets/js/utils.js"></script> <!-- Useful functions -->
-    <script type="text/javascript" src="assets/js/main.js"></script> <!-- Map code (this is the main source!) -->
-    <script type="text/javascript" src="assets/js/init.js"></script> <!-- Initialization / cleanup -->
-    <script type="text/javascript" src="assets/js/search.js"></script> <!-- Custom store search -->
+    <script type="text/javascript" src="assets/js/settings.js"></script>
+    <script type="text/javascript" src="assets/js/utils.js"></script>
+    <script type="text/javascript" src="assets/js/actions.js"></script>
+    <script type="text/javascript" src="assets/js/map.js"></script>
+    <script type="text/javascript" src="assets/js/search.js"></script>
 </body>
 
 </html>

@@ -6,34 +6,35 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-// Reserve variables for the map and geolocation control
 var map;
 var geolocateControl;
-window.alreadyLocated = false;
 window.duplicates = [];
 window.cache = [];
 
-const ACCESS_TOKEN = 'pk.eyJ1IjoiYnJpYW53YWxjemFrIiwiYSI6ImNtNXE2ZXJzZzA4emIyanExdmI0MGZhYW4ifQ.58j41e6A78-4Md1B0EJ5FQ';
+const ACCESS_TOKEN = 'pk.eyJ1IjoiYnJpYW53YWxjemFrIiwiYSI6ImNtN3Y5OWFuOTA4bzgyc3B0OWlyajBiemoifQ.zWZG8bzqHAH8__h-ay62Xw';
 const ZOOM_THRESHOLD = 11;
 // Warning: if anybody is planning to use this, you literally can't do anything with this token... it's meant to be public lol
 // You won't be able to use it on any other site, so don't even try it.
 // If you want to use Mapbox, you need to get your own token from their website.
 // Oh... and I also update this token every time I commit, so it's useless to you anyway. :P
 
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
 // Creates the map and all of its features
 function spawnMapInstance() {
     return new Promise((resolve, reject) => {
-        let mapTheme = settings.theme(); // get theme color
+        let mapTheme = settings.theme();
+
         if (map && geolocateControl) {
             return resolve(true);
         }
 
         console.warn('A map request has been called, creating a new map instance with Mapbox GL JS.\nWarning: You WILL be charged for Mapbox API requests!');
         mapboxgl.accessToken = ACCESS_TOKEN;
-        
-        if(mapTheme == 'light') {
+
+        if (mapTheme == 'light') {
             mapTheme = 'mapbox://styles/mapbox/light-v11'
-        } else if(mapTheme == 'dark') {
+        } else if (mapTheme == 'dark') {
             mapTheme = 'mapbox://styles/mapbox/dark-v11'
         }
 
@@ -41,7 +42,7 @@ function spawnMapInstance() {
             container: 'map',
             style: mapTheme,
             center: [-98.5795, 39.8283],
-            zoom: 2,
+            zoom: 4,
             failIfMajorPerformanceCaveat: false
         });
 
@@ -52,42 +53,62 @@ function spawnMapInstance() {
         });
 
         map.addControl(geolocateControl);
+
         const btn = document.createElement('button');
         btn.className = 'geolocate-btn';
         btn.innerHTML = '';
         btn.onclick = async () => {
-            geolocateControl.trigger();
-            
-            if (typeof(DeviceMotionEvent) !== "undefined" && typeof(DeviceMotionEvent.requestPermission) === "function") { // if they're on an iOS device
+            const permission = await checkPermission(); // check user permissions for location
+
+            // if permission wasn't yet granted, show instructions
+            if (permission === "prompt") {
+                document.body.insertAdjacentHTML('afterbegin', '<div id=geoLocationLoading class=popup><div class=content><h1 style=margin-top:5px;margin-bottom:10px>One More Step!</h1><p style=margin-top:0;line-height:24px>Before you continue, please enable location permissions when prompted.<div style=margin-top:5px; class=option><p style="margin: 10px 0px; margin-bottom: 5px; color: grey;">Waiting for permission...</p></div></div></div>');
+                document.getElementById('geoLocationLoading').offsetWidth
+                $('#geoLocationLoading').addClass('show');
+            } else if (permission === "denied") {
+                return false; // return false if location access was already denied
+            }
+
+            if (typeof (DeviceMotionEvent) !== "undefined" && typeof (DeviceMotionEvent.requestPermission) === "function") { // if they're on an iOS device
                 try {
                     await DeviceMotionEvent.requestPermission(); // request permission for orientation tracking
-                } catch (error) {}
+                } catch { };
             }
+
+            // remove instruction popup after location is granted
+            geolocateControl.on('geolocate', async () => {
+                if ($('#geoLocationLoading')) {
+                    $('#geoLocationLoading').removeClass('show');
+                    await sleep(200);
+                    $('#geoLocationLoading').remove();
+                }
+
+                geolocateControl.off('geolocate');
+            });
+
+            geolocateControl.trigger();
         };
+
         document.body.appendChild(btn);
 
         geolocateControl.on('trackuserlocationstart', () => {
             $('.geolocate-btn').addClass('active');
         });
-          
+
         geolocateControl.on('trackuserlocationend', () => {
             $('.geolocate-btn').removeClass('active');
-        });      
+        });
 
-        map.on('load', function() {
+        map.on('load', function () {
             map.resize();
             console.log('The map has been loaded successfully, user can now access.');
 
             resolve(true);
         });
 
-        map.on('error', function(err) {
+        map.on('error', function (err) {
             console.error('Error loading the map:', err);
             reject(err);
-        });
-
-        geolocateControl.once('geolocate', (event) => {
-            window.alreadyLocated = true;
         });
     });
 }
@@ -114,10 +135,10 @@ function updateClusters() {
     features.forEach(store => {
         try {
             const cache = window.cache[store.id];
-            
+
             map.setFeatureState({ source: 'storeSource', id: store.id }, { color: settings.color(cache.status, 'marker') });
             zoomedInStores.add(store.id);
-        } catch (error) {}
+        } catch (error) { }
     });
 
     // Remove any stores that are no longer in view
@@ -166,7 +187,7 @@ async function downloadClusters() {
         worker.postMessage({}); // we're just sending a dummy message to trigger the worker
 
         // wait for the worker to return the store data (finished yayy)
-        worker.onmessage = function(event) {
+        worker.onmessage = function (event) {
             const { stores, cached, duplicates, error } = event.data;
 
             if (error) {
@@ -183,7 +204,7 @@ async function downloadClusters() {
                 data: { type: 'FeatureCollection', features: stores },
                 promoteId: 'id' // set to the store id
             });
-            
+
             // Add a marker for each store (far distance)
             map.addLayer({
                 id: 'storeLayer',
@@ -193,7 +214,7 @@ async function downloadClusters() {
                     'circle-radius': [
                         'interpolate',
                         ['linear'], ['zoom'],
-                        5,  3,  // At zoom level 5, radius is 3
+                        5, 3,  // At zoom level 5, radius is 3
                         10, 6,  // At zoom level 10, radius is 6
                         15, 12, // At zoom level 15, radius is 12
                         20, 24  // At zoom level 20, radius is 24
@@ -205,19 +226,19 @@ async function downloadClusters() {
             map.on('mouseenter', 'storeLayer', () => {
                 map.getCanvas().style.cursor = 'pointer';
             });
-            
+
             map.on('mouseleave', 'storeLayer', () => {
                 map.getCanvas().style.cursor = '';
             });
 
             map.on('click', 'storeLayer', (e) => {
-                if(e.features.length == 0) return;
-                if(map.getZoom() < ZOOM_THRESHOLD) {
+                if (e.features.length == 0) return;
+                if (map.getZoom() < ZOOM_THRESHOLD) {
                     return map.easeTo({
                         center: e.features[0].geometry.coordinates,
                         zoom: Math.floor(map.getZoom()) + 2,
                         duration: 500,
-                        easing: function(t) {
+                        easing: function (t) {
                             return t * (2 - t);
                         }
                     });
@@ -242,19 +263,18 @@ async function downloadClusters() {
 }
 
 // Initializes the map and starts processing the clusters
-async function initMap() {
-    await sleep(200);
+(async () => {
     await spawnMapInstance(); // create the map instance (if not already created)
-
-    $("#start").fadeOut(200); // fade out the start screen (if not already hidden)
-    $(".toggle#settings").html("settings"); // set the settings toggle to the settings icon
-    await fadeInOpacity($("#map"), 200); // fade in the map
-    $(".toggle#settings").show(); // show the settings toggle
+    await fadeInOpacity($("#map"), 200); // show the map now that it's ready
 
     window.addEventListener('resize', () => {
         map.resize(); // only resize map to adjust for display sizes/changes
     });
 
-    downloadClusters(); // start downloading the clusters
-    return true;
-}
+    // try showing user location if enabled
+    if (await checkPermission() === "granted") {
+        $('.geolocate-btn').click();
+    }
+
+    await downloadClusters(); // start downloading the clusters
+})();

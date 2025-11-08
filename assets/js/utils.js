@@ -6,29 +6,33 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-// Track the user's geolocation on initial load
-function trackGeolocation() {
-    return new Promise((resolve, reject) => { 
-      geolocateControl.off('geolocate'); 
-      geolocateControl.off('error');
+// Checks for precise location user permissions
+async function checkPermission() {
+  if (!navigator.permissions) {
+    return "unknown";
+  }
 
-      if(!window.userGeolocated) { // if they haven't already been located
-        geolocateControl.once('geolocate', (event) => {
-          map.setCenter([event.coords.longitude, event.coords.latitude]);
-          map.setZoom(14);
-          resolve(true);
-        });
-      
-        geolocateControl.once('error', () => {
-          resolve(false);
-        });
+  try {
+    const status = await navigator.permissions.query({ name: "geolocation" });
 
-        geolocateControl.trigger();
-      } else {
-        $('.geolocate-btn').click();
-        resolve(true);
-      }
-    });
+    switch (status.state) {
+      case "granted":
+        console.log("We have access to watch the location.");
+        return "granted";
+      case "denied":
+        console.log("Access to watch location has been blocked.");
+        return "denied";
+      case "prompt":
+        console.log("User hasn't decided yet. Need to request access.");
+        return "prompt";
+      default:
+        console.error("Unexpected permission state:", status.state);
+        return "unknown";
+    }
+  } catch (error) {
+    console.error("Error checking permission:", error);
+    return "error";
+  }
 }
 
 // Look for duplicate coordinates in the data
@@ -38,7 +42,7 @@ function searchDuplicates(lng, lat) {
   window.duplicates.forEach(duplicate => {
     const { lng: dLng, lat: dLat } = duplicate.properties;
 
-    if(Number(lng) == Number(dLng) && Number(lat) == Number(dLat)) {
+    if (Number(lng) == Number(dLng) && Number(lat) == Number(dLat)) {
       matchingEntries.push(duplicate);
     }
   });
@@ -56,28 +60,44 @@ async function getStoreData(storeId) {
   return res[0];
 }
 
+// Get the user's IP-based location
+let ipCache = null;
+async function getIPLocation() {
+  if (ipCache) return ipCache;
+  
+  try {
+    const req = await fetch("https://ipinfo.io/json");
+    const res = await req.json();
+
+    ipCache = res?.loc?.split(",");
+    return ipCache;
+  } catch (error) {
+    return null;
+  }
+}
+
 // Update status of a kiosk location
 async function submitFeedback(storeId, status, notes = null) {
-  if(notes == null) {
+  if (notes == null) {
     const oldData = await getStoreData(storeId);
 
     notes = oldData.notes;
   }
-  
+
   const req = await fetch("https://findaredbox.kbots.tech/update", {
     method: "POST",
     headers: {
-        "content-type": "application/json"
+      "content-type": "application/json"
     },
     body: JSON.stringify({
-        id: storeId,
-        notes,
-        status
+      id: storeId,
+      notes,
+      status
     })
   });
   const res = await req.json();
 
-  if(res.message === "Store updated successfully.") {
+  if (res.message === "Store updated successfully.") {
     console.log("The user feedback for this location was sent successfully.");
 
 

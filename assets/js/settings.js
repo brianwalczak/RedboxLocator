@@ -8,19 +8,19 @@
 
 const settings = {
     // get the settings from local storage
-    get: function(value = null) {
+    get: function (value = null) {
         const getSettings = localStorage.getItem('settings');
         let result = {};
 
-        if(getSettings) {
+        if (getSettings) {
             try {
                 result = JSON.parse(getSettings);
-            } catch(error) {
+            } catch (error) {
                 result = {}; // keep empty
             }
         }
 
-        if(value) {
+        if (value) {
             return result[value] || null;
         } else {
             return result;
@@ -28,14 +28,14 @@ const settings = {
     },
 
     // set the settings in local storage
-    set: function(key, value) {
+    set: function (key, value) {
         const getSettings = localStorage.getItem('settings');
         let result = {};
 
-        if(getSettings) {
+        if (getSettings) {
             try {
                 result = JSON.parse(getSettings);
-            } catch(error) {
+            } catch (error) {
                 result = {}; // keep empty
             }
         }
@@ -46,8 +46,8 @@ const settings = {
     },
 
     // delete a setting from local storage
-    del: function(key = null) {
-        if(!key) {
+    del: function (key = null) {
+        if (!key) {
             localStorage.removeItem('settings');
             return {};
         }
@@ -55,19 +55,21 @@ const settings = {
         let result = settings.get();
         try {
             delete result[key];
-        } catch(error) {
+        } catch (error) {
             return result;
         }
 
         localStorage.setItem('settings', JSON.stringify(result));
         return result;
     },
-    theme: function(value) {
+
+    // get or set the theme
+    theme: function (value) {
         let theme = settings.get('theme');
-        if(!theme && !value) {
+        if (!theme && !value) {
             settings.set('theme', 'dark'); // default to dark theme
             theme = 'dark';
-        } else if(value) {
+        } else if (value) {
             settings.set('theme', value);
             theme = value;
         }
@@ -75,7 +77,9 @@ const settings = {
         $('body').removeClass('lightMode darkMode').addClass(theme == 'light' ? 'lightMode' : 'darkMode');
         return theme;
     },
-    color: function(status, type) {
+
+    // get the correct color for a status
+    color: function (status, type) {
         let theme = settings.theme();
         let markerColor;
         let textColor;
@@ -90,7 +94,7 @@ const settings = {
                 textColor = '#FFC107';
                 break;
             case 'Removed':
-                markerColor = settings.theme() == 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)';
+                markerColor = theme == 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)';
                 textColor = 'red';
                 break;
             case 'Error (See notes for error code)':
@@ -98,7 +102,7 @@ const settings = {
                 textColor = 'red';
                 break;
             case 'Never Existed':
-                markerColor = settings.theme() == 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)';
+                markerColor = theme == 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)';
                 textColor = 'red';
                 break;
         }
@@ -108,11 +112,11 @@ const settings = {
 };
 
 // swap the themes to the opposite (used for the theme toggle)
-settings.theme.swap = function() {
+settings.theme.swap = function () {
     if ($('body').hasClass('lightMode')) {
         settings.theme('dark');
         return location.reload();
-    } else if($('body').hasClass('darkMode')) {
+    } else if ($('body').hasClass('darkMode')) {
         settings.theme('light');
         return location.reload();
     }
