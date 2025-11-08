@@ -22,7 +22,6 @@ html, body {
 .search-input {
     width: 100%;
     padding: 8px 35px;
-    border: 1px solid #ccc;
     border-radius: 5px;
     outline: none;
     font-size: 14px;
@@ -115,8 +114,7 @@ html, body {
     right: 10px;
     top: 50%;
     transform: translateY(-50%);
-    font-size: 18px;
-    color: black;
+    font-size: 18px !important;
+    color: white;
     cursor: pointer;
-    font-weight: 700;
 }
