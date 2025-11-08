@@ -2,9 +2,6 @@
 
 <p align="center">A feature-rich mapping system to find Redbox locations near you. Powered by Mapbox GL JS, Supercluster, jQuery, and many more open-source libraries. ❤<br></p>
 
-> [!TIP]
-> Interested in the Redbox location database? Visit the about page [here](https://github.com/BrianWalczak/RedboxLocator/blob/main/about.md) to learn more!
-
 ## Features
 - Effortlessly find Redbox kiosks near you with your precise location.
 - Access live status updates on Redbox machines across the U.S.

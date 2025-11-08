@@ -1,12 +1,5 @@
-# these are only used during development
-scrape/
-static/js/main.old.js
-stores.orig.json
-stores.raw.json
-stores.json
-coordinates.json
-plan.txt
-
-# removing these cause they don't look great
-static/img/marker.webp
-static/img/redbox.png
+node_modules/
+package-lock.json
+package.json
+_site/
+.jekyll-cache/

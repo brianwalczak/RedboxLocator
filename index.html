@@ -1,3 +1,6 @@
+---
+---
+
 <!--
   Copyright (c) 2025 Brian Walczak
   All rights reserved.
@@ -8,42 +11,49 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Redbox Locator | Redbox.my - Find a Kiosk Near You</title>
-    <link rel="stylesheet" href="static/css/style.css" /> <!-- Page Styling -->
-    <link rel="stylesheet" href="static/css/theme.css" /> <!-- Themes (Light/Dark) -->
-    <link rel="stylesheet" href="static/css/search.css" /> <!-- Search Results CSS -->
+    <link rel="stylesheet" href="assets/css/style.css" /> <!-- Page Styling -->
+    <link rel="stylesheet" href="assets/css/theme.css" /> <!-- Themes (Light/Dark) -->
+    <link rel="stylesheet" href="assets/css/search.css" /> <!-- Search Results CSS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <meta name="apple-mobile-web-app-capable" content="yes">
-	<meta name="mobile-web-app-capable" content="yes">
-	<meta name="apple-mobile-web-app-status-bar-style" content="black">
-	<meta name="format-detection" content="telephone=no">
-	<meta name="msapplication-TileColor" content="#111111">
-	<meta name="theme-color" content="#111111">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-TileColor" content="#111111">
+    <meta name="theme-color" content="#111111">
 
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <link rel="icon" type="image/svg+xml" href="/static/img/favicon.svg">
-    <link rel="apple-touch-icon" sizes="180x180" href="/static/img/logo.png">
+    <link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/logo.png">
     <link rel="canonical" href="https://search.redbox.my/" />
     <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' />
 
     <meta property="og:title" content="Redbox Locator | Redbox.my - Find a Kiosk Near You" />
-	<meta name="description" content="Find Redbox kiosks near you with a community-curated map of historical and current Redbox kiosk locations. Become a community contributor to improve the map for others!" />
-	<meta property="og:description" content="Find Redbox kiosks near you with a community-curated map of historical and current Redbox kiosk locations. Become a community contributor to improve the map for others!" />
-	<meta property="og:locale" content="en_US" />
-	<meta property="og:type" content="website" />
-	<meta property="og:url" content="https://search.redbox.my/" />
-	<meta property="og:site_name" content="Redbox Locator | Redbox.my" />
+    <meta name="description"
+        content="Find Redbox kiosks near you with a community-curated map of historical and current Redbox kiosk locations. Become a community contributor to improve the map for others!" />
+    <meta property="og:description"
+        content="Find Redbox kiosks near you with a community-curated map of historical and current Redbox kiosk locations. Become a community contributor to improve the map for others!" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://search.redbox.my/" />
+    <meta property="og:site_name" content="Redbox Locator | Redbox.my" />
     <style>
-        html, body {
+        html,
+        body {
             overflow: hidden !important;
         }
 
@@ -84,6 +94,7 @@
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 </head>
+
 <body>
     <div class="header">
         <div id="color" class="toggle" onclick="settings.theme.swap()"></div>
@@ -94,12 +105,12 @@
         <input type="text" class="search-input" placeholder="Search">
         <span class="close-icon material-icons">close</span>
     </div>
-        
+
     <div id="start" style="display: none;">
         <h1 class="title">Redbox Locator</h1>
         <p class="desc" style="margin-top: -15px;"></p><br>
         <button onclick="actions.useCurrentLocation()" class="locationBtn">Use Current Location</button>
-        
+
         <div class="divider">OR</div>
         <form>
             <select id="stateList" name="state">
@@ -109,7 +120,7 @@
 
         <button onclick="actions.zoomToState()" class="stateBtn">Choose State</button>
     </div>
-        
+
     <div id="map" style="opacity: 0; visibility: hidden;"></div>
     <div class="search-results">
         <div class="draggable-area">
@@ -117,11 +128,12 @@
         </div>
         <div class="locations"></div>
     </div>
-    
-    <script type="text/javascript" src="static/js/settings.js"></script> <!-- Settings configuration -->
-    <script type="text/javascript" src="static/js/utils.js"></script> <!-- Useful functions -->
-    <script type="text/javascript" src="static/js/main.js"></script> <!-- Map code (this is the main source!) -->
-    <script type="text/javascript" src="static/js/init.js"></script> <!-- Initialization / cleanup -->
-    <script type="text/javascript" src="static/js/search.js"></script> <!-- Custom store search -->
+
+    <script type="text/javascript" src="assets/js/settings.js"></script> <!-- Settings configuration -->
+    <script type="text/javascript" src="assets/js/utils.js"></script> <!-- Useful functions -->
+    <script type="text/javascript" src="assets/js/main.js"></script> <!-- Map code (this is the main source!) -->
+    <script type="text/javascript" src="assets/js/init.js"></script> <!-- Initialization / cleanup -->
+    <script type="text/javascript" src="assets/js/search.js"></script> <!-- Custom store search -->
 </body>
+
 </html>
