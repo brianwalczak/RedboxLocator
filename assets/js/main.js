@@ -162,7 +162,7 @@ async function servePopup(e) {
 // Downloads the store data and creates the clusters
 async function downloadClusters() {
     try {
-        const worker = new Worker('./static/js/worker.js'); // start downloading the store data in a worker thread
+        const worker = new Worker('./assets/js/worker.js'); // start downloading the store data in a worker thread
         worker.postMessage({}); // we're just sending a dummy message to trigger the worker
 
         // wait for the worker to return the store data (finished yayy)
