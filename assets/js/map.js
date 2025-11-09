@@ -105,15 +105,74 @@ function spawnMapInstance() {
 }
 
 // Serves the popup for a store location (creates it)
-async function servePopup(e) {
-    const feature = e.features[0];
-    const store = JSON.parse(feature.properties.kiosks)?.[0]; // get the first store (we'll handle duplicates later)
+async function servePopup(feature, lngLat, index = null) {
+    const kiosks = JSON.parse(feature.properties.kiosks);
     const { lng, lat } = feature.properties;
 
+    // If there are multiple kiosks at this location and no specific kiosk is selected, show the selection modal
+    if (kiosks.length > 1 && index === null) {
+        document.body.insertAdjacentHTML('afterbegin', `
+            <div id="settingsModal" class="popup" style="display: none; padding: 5px;">
+                <div class="content">
+                    <h1 style="margin-top: 0px; margin-bottom: 20px;">Multiple Kiosks</h1>
+
+                    <div class="row" style="margin-bottom: 18px;">
+                        <span>Show unknown opening date</span>
+
+                        <label class="switch">
+                            <input type="checkbox" id="showUnknownDate">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="option" style="margin-top: 20px;">
+                        <button onclick="closeSettings()">Close</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="kioskSelector" class="popup">
+                <div class="content">
+                    <h1 style="margin-top:5px;margin-bottom:15px">Multiple Kiosks Found</h1>
+                    <p style="margin-top:0;margin-bottom:20px">There are multiple kiosks at this location. Please select one to view details:</p>
+                    <span class="close corner-icon">close</span>
+
+                    ${kiosks.map((kiosk, index) => `
+                        <div class="row" index="${index}" style="margin-bottom: ${index === kiosks.length - 1 ? '0' : '18px'}; cursor: pointer; user-select: none;">
+                            <div>
+                                <b>${kiosk.bannerName || 'Unknown'}</b><br>
+                                <span style="color: grey">${kiosk.address}</span>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `);
+        document.getElementById('kioskSelector').offsetWidth;
+        $('#kioskSelector').addClass('show');
+
+        $('#kioskSelector .row').on('click', async function () {
+            $('#kioskSelector').removeClass('show');
+            await sleep(200);
+            $('#kioskSelector').remove();
+            
+            servePopup(feature, lngLat, Number($(this).attr('index')));
+        });
+
+        $('.close').on('click', async function () {
+            $('#kioskSelector').removeClass('show');
+            await sleep(200);
+            $('#kioskSelector').remove();
+        });
+
+        return;
+    }
+
+    const store = kiosks[index !== null ? index : 0];
     const popup = new mapboxgl.Popup({ offset: [0, -15], closeButton: false, closeOnMove: true })
-        .setLngLat(e.lngLat) // set lng, lat of the popup itself
+        .setLngLat(lngLat) // set lng, lat of the popup itself
         .setHTML(`
-            <span class="edit" onclick="actions.handleFeedback('${store.id}')">edit</span>
+            <span class="corner-icon" onclick="actions.handleFeedback('${store.id}')">edit</span>
             <div class=main>
                 <h3 style='margin: 0px; margin-top: 5px; margin-bottom: 10px'>${store.bannerName || 'Unknown'}</h3>
                 ${store.address}<br>
@@ -123,9 +182,6 @@ async function servePopup(e) {
                 <b>Longitude: </b>${lng}<br><br>
                 <span class=notes></span>
                 <a href="${actions.createDirections(lng, lat)}" onclick="actions.userFeedback('${store.id}')" target="_blank">Get Directions</a>
-            </div>
-            <div class=duplicates style="color: grey; display: none; data-loaded: false; width: 100%;">
-                <h3 style='margin: 0px; margin-top: 5px; margin-bottom: 10px'>Duplicate Records</h3>
             </div>
         `)
         .addTo(map);
@@ -211,7 +267,7 @@ async function downloadClusters() {
                     });
                 };
 
-                return servePopup(e); // show popup if zoomed in enough
+                return servePopup(e.features[0], e.lngLat); // show popup if zoomed in enough
             });
 
             worker.terminate(); // clean up the worker after we're done with it

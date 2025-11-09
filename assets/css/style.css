@@ -161,7 +161,7 @@ select, select option {
     }
 }
 
-span.edit {
+span.corner-icon {
     cursor: pointer;
     font-family: 'Material Symbols Outlined';
     position: absolute;
