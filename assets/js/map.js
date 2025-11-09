@@ -162,7 +162,7 @@ async function servePopup(feature, lngLat, index = null) {
                 <b>Latitude: </b>${lat}<br>
                 <b>Longitude: </b>${lng}<br><br>
                 <span class=notes></span>
-                <a href="${actions.createDirections(lng, lat)}" onclick="actions.userFeedback('${store.id}')" target="_blank">Get Directions</a>
+                <a href="${actions.createDirections(lng, lat)}" onclick="actions.userFeedback('${store.id}', ${window.cache[store.id].status === 'Unconfirmed' ? 'true' : 'false'})" target="_blank">Get Directions</a>
             </div>
         `)
         .addTo(map);

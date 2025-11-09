@@ -61,8 +61,8 @@ const actions = {
             return false;
         }
     },
-    userFeedback: async function (storeId) {
-        if (!!localStorage.getItem('suppressFeedback')) return;
+    userFeedback: async function (storeId, isUnconfirmed) {
+        if (!!localStorage.getItem('suppressFeedback') || !isUnconfirmed) return;
 
         // the user will leave the page so wait until they come back
         console.log("User requested directions for store, waiting for them to return...");
