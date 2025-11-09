@@ -113,7 +113,7 @@ async function servePopup(e) {
     const popup = new mapboxgl.Popup({ offset: [0, -15], closeButton: false, closeOnMove: true })
         .setLngLat(e.lngLat) // set lng, lat of the popup itself
         .setHTML(`
-            <span class="edit">edit</span>
+            <span class="edit" onclick="actions.handleFeedback('${store.id}')">edit</span>
             <div class=main>
                 <h3 style='margin: 0px; margin-top: 5px; margin-bottom: 10px'>${store.bannerName || 'Unknown'}</h3>
                 ${store.address}<br>

@@ -87,7 +87,7 @@ const actions = {
                     $('#kioskFeedback').html("<div style=display:none; class=content><h1 style=margin-top:5px;margin-bottom:15px>What Happened?</h1><p style=margin-top:0;line-height:24px>Does this kiosk still work as expected? Your feedback will help hundreds of others find a working Redbox!<div class=option><button class=disagree style=background:#333;margin-right:10px>Somethings up.</button><button class=agree>It works!</button></div><div class=timer-bar><div style='animation: fillBar 10s linear forwards;' class=timer-fill></div></div></div>");
 
                     $('#kioskFeedback .content').fadeIn(200);
-                    return actions.handleFeedback($('#kioskFeedback'), storeId); // handle the feedback
+                    return actions.handleFeedback(storeId, $('#kioskFeedback')); // handle the feedback
                 });
 
                 $(document).off("visibilitychange", onVisibilityChange); // remove the event listener so it doesn't keep looping
@@ -96,46 +96,29 @@ const actions = {
 
         $(document).on("visibilitychange", onVisibilityChange);
     },
-    handleFeedback: function (popup, storeId) {
-        // close the popup if they don't respond
-        popup.find('.timer-fill').on('animationend', async function () {
-            await sleep(500);
-            console.log('User did not respond to feedback request, closing popup...');
-
-            popup.removeClass('show');
-            await sleep(200);
-            popup.remove();
-        });
-
-        // submit the location as operational
-        popup.find('.agree').click(async function () {
-            await submitFeedback(storeId, "Operational"); // we don't need to include notes (it will use the pre-existing notes)
-            return actions.successFeedback(popup); // show them success message
-        });
-
-        // ask them what happened if there's problems with the location
-        popup.find('.disagree').click(async function () {
+    handleFeedback: async function (storeId, popup) {
+        const getFeedback = async () => {
             // get up-to-date info on the notes so they can add to it
             const oldData = await getStoreData(storeId); // used so we can set the default status options to the previous status
 
             popup.html(`
-                <div class="content">
-                    <h1 style="margin-top:5px;margin-bottom:15px">What Happened?</h1>
-                    <p style="margin-top:0;line-height:24px">Please select the issue you experienced with this kiosk below, and add an additional note if needed.</p>
-                    <select class=status>
-                        <option value="Operational">Operational</option>
-                        <option value="Turned Off">Turned Off</option>
-                        <option value="Removed">Removed</option>
-                        <option value="Error (See notes for error code)">Error (please clarify)</option>
-                        <option value="Never Existed">Never Existed</option>
-                    </select>
-                    <textarea class=notes placeholder="Additional notes..." style="margin-top: 10px; width: 75%; resize: none;">${oldData?.notes?.replace("\n!!!RBConfirmedOperational!!!", "") || ''}</textarea>
-                    <div class="option">
-                        <button class="cancel" style="background:#333;margin-right:10px">Cancel</button>
-                        <button class="submit">Submit</button>
+                    <div class="content">
+                        <h1 style="margin-top:5px;margin-bottom:15px">What Happened?</h1>
+                        <p style="margin-top:0;line-height:24px">Please select the issue you experienced with this kiosk below, and add an additional note if needed.</p>
+                        <select class=status>
+                            <option value="Operational">Operational</option>
+                            <option value="Turned Off">Turned Off</option>
+                            <option value="Removed">Removed</option>
+                            <option value="Error (See notes for error code)">Error (please clarify)</option>
+                            <option value="Never Existed">Never Existed</option>
+                        </select>
+                        <textarea class=notes placeholder="Additional notes..." style="margin-top: 10px; width: 75%; resize: none;">${oldData?.notes?.replace("\n!!!RBConfirmedOperational!!!", "") || ''}</textarea>
+                        <div class="option">
+                            <button class="cancel" style="background:#333;margin-right:10px">Cancel</button>
+                            <button class="submit">Submit</button>
+                        </div>
                     </div>
-                </div>
-            `);
+                `);
 
             popup.find('.status').val(oldData.status === 'Unconfirmed' ? 'Operational' : oldData.status); // set the default option to the previous status
 
@@ -153,7 +136,35 @@ const actions = {
 
                 return;
             });
-        });
+        };
+
+        if (popup) {
+            // close the popup if they don't respond
+            popup.find('.timer-fill').on('animationend', async function () {
+                await sleep(500);
+                console.log('User did not respond to feedback request, closing popup...');
+
+                popup.removeClass('show');
+                await sleep(200);
+                popup.remove();
+            });
+
+            // submit the location as operational
+            popup.find('.agree').click(async function () {
+                await submitFeedback(storeId, "Operational"); // we don't need to include notes (it will use the pre-existing notes)
+                return actions.successFeedback(popup); // show them success message
+            });
+
+            // ask them what happened if there's problems with the location
+            popup.find('.disagree').click(getFeedback);
+        } else {
+            document.body.insertAdjacentHTML('afterbegin', "<div id=kioskFeedback class=popup></div>");
+            popup = $('#kioskFeedback');
+
+            await getFeedback();
+            document.getElementById('kioskFeedback').offsetWidth
+            popup.addClass('show');
+        }
     },
     successFeedback: async function (popup) {
         popup.html(`<div class="content"><h1 style="margin-top:5px;margin-bottom:15px">Thanks!</h1><p style="margin-top:0;line-height:24px">Your report helps others hundreds of others find a working Redbox! 🎉</p><br><div class=timer-bar><div style='animation: fillBar 2s linear forwards;' class=timer-fill></div></div></div>`);
