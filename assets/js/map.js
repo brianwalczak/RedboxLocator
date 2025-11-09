@@ -182,7 +182,7 @@ async function downloadClusters() {
                         15, 12, // At zoom level 15, radius is 12
                         20, 24  // At zoom level 20, radius is 24
                     ],
-                    'circle-color': ['coalesce', ['feature-state', 'color'], ['get', 'marker', ['get', 'color']]] // prioritize feature changes, otherwise use default from geojson, otherwise use Operational
+                    'circle-color': ['coalesce', ['feature-state', 'color'], ['get', 'color']] // prioritize feature changes, otherwise use default from geojson, otherwise use Operational
                 }
             });
 
