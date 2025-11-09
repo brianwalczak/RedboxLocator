@@ -106,8 +106,9 @@ function spawnMapInstance() {
 
 // Serves the popup for a store location (creates it)
 async function servePopup(feature, lngLat, index = null) {
-    const kiosks = JSON.parse(feature.properties.kiosks);
+    let kiosks = JSON.parse(feature.properties.kiosks);
     const { lng, lat } = feature.properties;
+    kiosks = localStorage.getItem('showUnknownDate') ? kiosks : kiosks.filter(kiosk => !!kiosk.openDate);
 
     // If there are multiple kiosks at this location and no specific kiosk is selected, show the selection modal
     if (kiosks.length > 1 && index === null) {
