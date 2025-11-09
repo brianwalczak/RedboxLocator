@@ -43,33 +43,10 @@ html, body {
 }
 
 button {
-    background-color: #e50813;
-    color: white; 
-    font-size: 15px; 
-    font-weight: 600; 
-    padding: 12px 24px; 
-    border: none; 
-    border-radius: 12px; 
+    border: none;
+    outline: none;
     cursor: pointer;
     font-family: 'Inter', sans-serif;
-    transition: all 0.2s ease;
-}
-
-button.secondary {
-    background-color: #333;
-}
-
-button:hover {
-    background-color: #f51621;
-    transform: translateY(-1px);
-}
-
-button.secondary:hover {
-    background-color: #444;
-}
-
-button:active {
-    transform: translateY(0);
 }
 
 select, input, textarea {
@@ -82,6 +59,7 @@ select, input, textarea {
     padding-right: 20px;
     color: #ffffff;
     border: 2px solid #555555;
+    outline: none;
     background-color: #333333;
 }
 
@@ -129,6 +107,33 @@ select, select option {
     display: flex;
     justify-content: flex-end;
     margin-top: 20px;
+}
+
+.popup .option button {
+    background-color: #e50813;
+    color: white; 
+    font-size: 15px; 
+    font-weight: 600; 
+    padding: 12px 24px; 
+    border-radius: 12px; 
+    transition: all 0.2s ease;
+}
+
+.popup .option button.secondary {
+    background-color: #333;
+}
+
+.popup .option button:hover {
+    background-color: #f51621;
+    transform: translateY(-1px);
+}
+
+.popup .option button.secondary:hover {
+    background-color: #444;
+}
+
+.popup .option button:active {
+    transform: translateY(0);
 }
 
 .timer-bar {
