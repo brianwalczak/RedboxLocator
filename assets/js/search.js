@@ -43,53 +43,50 @@ $(document).ready(function () {
             };
         }
 
-        const searchResults = map.getSource('storeSource')._data.features.filter(feature => {
-            if (feature.properties.openDate === 'Unknown' && !settings.get('showUnknownDate')) {
-                return false;
-            }
+        let searchResults = map.getSource('storeSource')._data.features.filter(feature => {
+            return feature.properties.kiosks.some(kiosk => {
+                if (!kiosk.openDate && !settings.get('showUnknownDate')) return false;
 
-            if (feature.properties.bannerName.toLowerCase().includes($('.search-input').val().toLowerCase())) {
-                return true;
-            }
-
-            return false;
+                return (kiosk.bannerName && kiosk.bannerName.toLowerCase().includes($('.search-input').val().toLowerCase()));
+            });
         });
 
-        let sortedData = searchResults;
-
         if (userCoords && userCoords.latitude && userCoords.longitude) {
-            sortedData = [...sortedData].sort((a, b) => {
+            searchResults.sort((a, b) => {
                 const distA = getDistance(userCoords.latitude, userCoords.longitude, a.geometry.coordinates[1], a.geometry.coordinates[0]);
                 const distB = getDistance(userCoords.latitude, userCoords.longitude, b.geometry.coordinates[1], b.geometry.coordinates[0]);
                 return distA - distB;
             });
         }
 
-        let resultsToShow = 20;
+        let resultsToShow = 20; // this is per location, not per kiosk
 
         const loadMoreResults = () => {
             const currentResults = $('.search-results .locations').children().length;
-            const newResults = sortedData.slice(currentResults, currentResults + resultsToShow);
+            const newResults = searchResults.slice(currentResults, currentResults + resultsToShow);
 
             newResults.forEach(result => {
-                const storeStatus = window.cache[result.properties.id].status;
+                result.properties.kiosks.forEach(kiosk => {
+                    if (!kiosk.openDate && !settings.get('showUnknownDate')) return; // skip if we aren't showing unknown dates
+                    const storeStatus = window.cache[kiosk.id].status;
 
-                $('.search-results .locations').append(`
-                <div class="location">
-                    <h3>${result.properties.bannerName} - <span style="color:${settings.color[storeStatus].text};">${storeStatus}</span></h3>
-                    <p>${result.properties.address}</p>
-                    <p>Opening Date: ${result.properties.openDate}</p>
-                    <p><a class="get-directions">Get Directions</a> ${userCoords ? '<span style="color: grey;">(~' + getDistance(userCoords.latitude, userCoords.longitude, result.geometry.coordinates[1], result.geometry.coordinates[0]).toFixed(1) + ' miles)</span>' : ''}</p>
-                </div>
-                `);
+                    $('.search-results .locations').append(`
+                        <div class="location">
+                            <h3>${kiosk.bannerName || 'Unknown'} - <span style="color:${settings.color[storeStatus].text};">${storeStatus}</span></h3>
+                            <p>${kiosk.address}</p>
+                            <p>Opening Date: ${kiosk.openDate || 'Unknown'}</p>
+                            <p><a class="get-directions">Get Directions</a> ${userCoords ? '<span style="color: grey;">(~' + getDistance(userCoords.latitude, userCoords.longitude, result.geometry.coordinates[1], result.geometry.coordinates[0]).toFixed(1) + ' miles)</span>' : ''}</p>
+                        </div>
+                    `);
 
-                $('.search-results .locations .location .get-directions').last().on('click', async function () {
-                    $('.close-icon').click(); // close the search results
-                    await sleep(300); // wait for the transition to finish
+                    $('.search-results .locations .location .get-directions').last().on('click', async function () {
+                        $('.close-icon').click(); // close the search results
+                        await sleep(300); // wait for the transition to finish
 
-                    return map.flyTo({
-                        center: [result.properties.lng, result.properties.lat],
-                        zoom: 16
+                        return map.flyTo({
+                            center: [result.properties.lng, result.properties.lat],
+                            zoom: 16
+                        });
                     });
                 });
             });

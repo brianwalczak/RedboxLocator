@@ -71,15 +71,5 @@ const settings = {
         'Error (See notes for error code)': { marker: 'rgb(255, 193, 7)', text: 'red', rank: 4 },
         'Never Existed': { marker: 'darkgrey', text: 'red', rank: 1 },
         'Unconfirmed': { marker: 'darkgrey', text: 'darkgrey', rank: 2 }
-    },
-
-    prioritize: function () {
-        const rules = [];
-
-        for (const [name, { marker, rank }] of Object.entries(this.color)) {
-            rules.push(['==', ['get', 'color'], marker], rank);
-        }
-
-        return rules;
     }
 };

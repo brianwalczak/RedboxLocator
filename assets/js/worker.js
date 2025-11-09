@@ -11,58 +11,58 @@ importScripts('/assets/js/settings.js');
 // Creates GeoJSON features from store data
 function createGeoJSON(stores) {
     const featuresMap = new Map(); // used to prevent duplicate coordinates
-    const duplicates = [] // used to store duplicates for later use
 
     stores.forEach(kiosk => {
         const coordsKey = `${kiosk.lon},${kiosk.lat}`;
+        const color = settings.color[(kiosk.status === 'Operational' && !kiosk.notes) ? 'Unconfirmed' : kiosk.status];
 
-        const newFeature = {
-            type: "Feature",
-            geometry: {
-                type: "Point",
-                coordinates: [kiosk.lon, kiosk.lat],
-            },
-            properties: {
-                id: kiosk.id,
-                bannerName: kiosk.banner_name || 'Unknown',
-                address: kiosk.address,
-                openDate: kiosk.open_date ? new Date(kiosk.open_date).toLocaleDateString() : 'Unknown',
-                color: settings.color[(kiosk.status === 'Operational' && !kiosk.notes) ? 'Unconfirmed' : kiosk.status].marker,
-
-                // we need to make a deep copy since geometry changes over time based on map movement
-                lng: parseFloat(kiosk.lon),
-                lat: parseFloat(kiosk.lat)
-            }
+        const data = {
+            id: kiosk.id,
+            bannerName: kiosk.banner_name,
+            address: kiosk.address,
+            openDate: kiosk.open_date ? new Date(kiosk.open_date).toLocaleDateString() : null
         };
 
         if (featuresMap.has(coordsKey)) {
             const existing = featuresMap.get(coordsKey); // get the already-existing one
 
-            // Prefer the address with longer length (obv may not be good enough but it's the best we can do, we want the most detailed!)
-            if (newFeature.properties.address.length > existing.properties.address.length) {
-                // Merge the two items into one (merge values if one includes data the other doesn't)
-                if (existing.properties.openDate !== 'Unknown') {
-                    newFeature.properties.openDate = existing.properties.openDate;
-                    newFeature.properties.isMerged = true;
-                }
+            if (existing.properties.kiosks) {
+                existing.properties.kiosks.push(data);
+            }
 
-                if (existing.properties.bannerName !== 'Unknown') {
-                    newFeature.properties.bannerName = existing.properties.bannerName;
-                    newFeature.properties.isMerged = true;
-                }
+            if (existing.properties.initColorRank < color.rank) {
+                existing.properties.initColor = color.marker; // update to higher priority color
+                existing.properties.initColorRank = color.rank;
+            }
 
-                featuresMap.set(coordsKey, newFeature); // update to the new, merged item
-                duplicates.push(existing); // add the old one to duplicates
-            } else {
-                duplicates.push(newFeature); // add the new one to duplicates
+            if (existing.properties.unknownDates && kiosk.open_date) {
+                existing.properties.unknownDates = false;
             }
         } else {
-            featuresMap.set(coordsKey, newFeature); // add if no duplicates
+            // add if no duplicates
+            featuresMap.set(coordsKey, {
+                type: "Feature",
+                geometry: {
+                    type: "Point",
+                    coordinates: [kiosk.lon, kiosk.lat],
+                },
+                properties: {
+                    initColor: color.marker,
+                    initColorRank: color.rank,
+                    unknownDates: !kiosk.open_date,
+                    kiosks: [data],
+
+                    // we need to make a deep copy since geometry changes over time based on map movement
+                    id: coordsKey,
+                    lng: parseFloat(kiosk.lon),
+                    lat: parseFloat(kiosk.lat)
+                }
+            });
         }
     });
 
     // Convert the map values into an array
-    return { result: Array.from(featuresMap.values()), duplicates };
+    return Array.from(featuresMap.values());
 }
 
 self.onmessage = async function (event) {
@@ -78,6 +78,7 @@ self.onmessage = async function (event) {
 
         // Cache the store data (status and notes)
         const cached = {};
+
         stores.forEach(store => {
             cached[store.id] = {
                 status: (store.status === 'Operational' && !store.notes) ? 'Unconfirmed' : store.status,
@@ -85,7 +86,7 @@ self.onmessage = async function (event) {
             };
         });
 
-        self.postMessage({ stores: geoJSON.result, cached, duplicates: geoJSON.duplicates });
+        self.postMessage({ stores: geoJSON, cached: cached });
     } catch (error) {
         self.postMessage({ error: error.message });
     }

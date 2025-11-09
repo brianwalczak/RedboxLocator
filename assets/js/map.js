@@ -8,7 +8,6 @@
 
 var map;
 var geolocateControl;
-window.duplicates = [];
 window.cache = [];
 
 const ACCESS_TOKEN = 'pk.eyJ1IjoiYnJpYW53YWxjemFrIiwiYSI6ImNtNXE2ZXJzZzA4emIyanExdmI0MGZhYW4ifQ.58j41e6A78-4Md1B0EJ5FQ';
@@ -108,18 +107,18 @@ function spawnMapInstance() {
 // Serves the popup for a store location (creates it)
 async function servePopup(e) {
     const feature = e.features[0];
-    const store = feature.properties;
+    const store = JSON.parse(feature.properties.kiosks)?.[0]; // get the first store (we'll handle duplicates later)
     const { lng, lat } = feature.properties;
 
     const popup = new mapboxgl.Popup({ offset: [0, -15], closeButton: false, closeOnMove: true })
         .setLngLat(e.lngLat) // set lng, lat of the popup itself
         .setHTML(`
-            <span class="view_duplicates" onclick="actions.viewDuplicates(${lng}, ${lat}, this)">history</span>
+            <span class="edit">edit</span>
             <div class=main>
-                <h3 style='margin: 0px; margin-top: 5px; margin-bottom: 10px'>${store.bannerName}${store.isMerged ? '<span onclick=actions.warnMerged() style="color:grey;cursor:help;"> (Modified)</span>' : ''}</h3>
+                <h3 style='margin: 0px; margin-top: 5px; margin-bottom: 10px'>${store.bannerName || 'Unknown'}</h3>
                 ${store.address}<br>
                 <b>Status: </b><span class=status>Loading...</span><br>
-                <b>Opening Date: </b>${store.openDate}<br>
+                <b>Opening Date: </b>${store.openDate || 'Unknown'}<br>
                 <b>Latitude: </b>${lat}<br>
                 <b>Longitude: </b>${lng}<br><br>
                 <span class=notes></span>
@@ -143,7 +142,7 @@ async function downloadClusters() {
 
         // wait for the worker to return the store data (finished yayy)
         worker.onmessage = function (event) {
-            const { stores, cached, duplicates, error } = event.data;
+            const { stores, cached, error } = event.data;
 
             if (error) {
                 console.error(error);
@@ -152,7 +151,6 @@ async function downloadClusters() {
             }
 
             window.cache = cached; // cache the store data for status updates
-            window.duplicates = duplicates; // cache the duplicates for viewing
 
             map.addSource('storeSource', {
                 type: 'geojson',
@@ -160,16 +158,22 @@ async function downloadClusters() {
                 promoteId: 'id' // set to the store id
             });
 
+            // Get rules for sorting marker layers by color
+            const rules = [];
+            for (const [name, { marker, rank }] of Object.entries(settings.color)) {
+                rules.push(['==', ['get', 'initColor'], marker], rank);
+            }
+
             // Add a marker for each store (far distance)
             map.addLayer({
                 id: 'storeLayer',
                 type: 'circle',
                 source: 'storeSource',
-                filter: (settings.get('showUnknownDate') ? null : ['!=', ['get', 'openDate'], 'Unknown']),
+                filter: (settings.get('showUnknownDate') ? null : ['!=', ['get', 'unknownDates'], true]),
                 layout: {
                     'circle-sort-key': [
                         'case',
-                        ...settings.prioritize(),
+                        ...rules,
                         0
                     ]
                 },
@@ -182,7 +186,7 @@ async function downloadClusters() {
                         15, 12, // At zoom level 15, radius is 12
                         20, 24  // At zoom level 20, radius is 24
                     ],
-                    'circle-color': ['coalesce', ['feature-state', 'color'], ['get', 'color']] // prioritize feature changes, otherwise use default from geojson, otherwise use Operational
+                    'circle-color': ['coalesce', ['feature-state', 'color'], ['get', 'initColor']] // prioritize feature changes, otherwise use default from geojson, otherwise use Operational
                 }
             });
 

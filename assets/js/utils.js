@@ -35,25 +35,6 @@ async function checkPermission() {
   }
 }
 
-// Look for duplicate coordinates in the data
-function searchDuplicates(lng, lat) {
-  let matchingEntries = [];
-
-  window.duplicates.forEach(duplicate => {
-    const { lng: dLng, lat: dLat, openDate } = duplicate.properties;
-
-    if (openDate === 'Unknown' && !settings.get('showUnknownDate')) {
-      return false;
-    }
-
-    if (Number(lng) == Number(dLng) && Number(lat) == Number(dLat)) {
-      matchingEntries.push(duplicate);
-    }
-  });
-
-  return matchingEntries;
-}
-
 // Get the store data from the API
 async function getStoreData(storeId) {
   const req = await fetch("https://findaredbox.kbots.tech/search/?id=" + storeId);
@@ -167,6 +148,6 @@ $(document).on('change', '#showUnknownDate', function () {
   settings.set('showUnknownDate', this.checked);
 
   if (map) {
-    map.setFilter('storeLayer', this.checked ? null : ['!=', ['get', 'openDate'], 'Unknown']);
+    map.setFilter('storeLayer', this.checked ? null : ['!=', ['get', 'unknownDates'], true]);
   }
 });

@@ -16,14 +16,37 @@ const actions = {
             return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`; // for androids and other devices
         }
     },
+    updateMarker: function (storeId, color) {
+        const feature = map.getSource('storeSource')._data.features.find(feature => {
+            return feature.properties.kiosks.find(kiosk => {
+                return kiosk.id == storeId;
+            });
+        });
+
+        const colors = [];
+
+        // re-compute the color based on all kiosks at this location
+        feature?.properties?.kiosks?.forEach(kiosk => {
+            let cache = window.cache[kiosk.id];
+            colors.push(settings.color[(cache.status === 'Operational' && !cache.notes) ? 'Unconfirmed' : cache.status]);
+        });
+
+        // get the highest priority color
+        colors.sort((a, b) => b.rank - a.rank);
+
+        if (colors[0]) {
+            map.setFeatureState({ source: 'storeSource', id: feature.properties.id }, { color: colors[0].marker });
+        }
+    },
     propogateChanges: function (storeId, updatedData = null) {
         if (!updatedData) updatedData = window.cache[storeId];
 
         try {
             const popupEl = $('.mapboxgl-popup');
-            map.setFeatureState({ source: 'storeSource', id: storeId }, { color: color.marker }); // update the marker color
             const color = settings.color[updatedData.status];
             let notes = updatedData?.notes?.replace("\n!!!RBConfirmedOperational!!!", "") || null;
+
+            actions.updateMarker(storeId); // update the marker color
 
             if (popupEl && popupEl.attr('data-id') === storeId) { // if the popup is open, update the status and notes
                 $(popupEl).find('.status').text(updatedData.status);
@@ -37,65 +60,6 @@ const actions = {
             console.log(error);
             return false;
         }
-    },
-    viewDuplicates: function (lng, lat, btn) {
-        const popupDiv = $(btn).parent().find(".main");
-        const dupeDiv = $(btn).parent().find(".duplicates");
-        dupeDiv.css('width', popupDiv.outerWidth());
-
-        if (dupeDiv.is(":visible")) { // if the duplicates are already visible, hide them
-            dupeDiv.hide();
-            popupDiv.show();
-
-            $(btn).text('history');
-            return;
-        } else if (popupDiv.is(":visible")) { // if the popup is visible, hide it and show the duplicates
-            popupDiv.hide();
-            dupeDiv.show();
-            $(btn).text('close');
-
-            if (dupeDiv.attr('data-loaded') === 'true') {
-                return;
-            } else {
-                const duplicates = searchDuplicates(lng, lat);
-
-                if (duplicates.length === 0) {
-                    dupeDiv.append("<i>No duplicate records found.</i>");
-                } else {
-                    // go through each duplicate and display the information
-                    duplicates.forEach(async (dupe, index) => {
-                        const { lng: dLng, lat: dLat } = dupe.properties;
-                        const store = dupe.properties;
-
-                        // we're just gonna use the original cached data cause it's not like they're gonna change by anyone else
-                        dupeDiv.append(`
-                            ${store.address}<br>
-                            <b>Status: </b>${window.cache[store.id].status}<br>
-                            <b>Opening Date: </b>${store.openDate}<br>
-                            <b>Latitude: </b>${dLat}<br>
-                            <b>Longitude: </b>${dLng}
-                        `);
-
-                        if ((index + 1) < duplicates.length) {
-                            dupeDiv.append('<br><br>'); // add space between each duplicate
-                        }
-                    });
-                }
-
-                dupeDiv.attr('data-loaded', 'true'); // mark as loaded (so we don't keep scraping the data)
-            }
-        }
-    },
-    warnMerged: function () {
-        document.body.insertAdjacentHTML('afterbegin', '<div id=mergedWarning class=popup><div class=content><h1 style=margin-top:5px;margin-bottom:15px>Location Merged</h1><p style=margin-top:0;line-height:24px>This location has been merged with duplicates to display up-to-date information. You can find duplicates by clicking the history button found on the popup.<div class=option><button class=agree>Understood.</button></div></div></div>');
-        document.getElementById('mergedWarning').offsetWidth
-        $('#mergedWarning').addClass('show'); // show popup which explains that the location has been merged with other duplicates for consistent info :)
-
-        $('#mergedWarning .agree').click(async function () {
-            $('#mergedWarning').removeClass('show');
-            await sleep(200);
-            $('#mergedWarning').remove();
-        });
     },
     userFeedback: async function (storeId) {
         // the user will leave the page so wait until they come back
