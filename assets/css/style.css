@@ -45,13 +45,31 @@ html, body {
 button {
     background-color: #e50813;
     color: white; 
-    font-size: 16px; 
-    font-weight: 700; 
-    padding: 10px 20px; 
+    font-size: 15px; 
+    font-weight: 600; 
+    padding: 12px 24px; 
     border: none; 
-    border-radius: .5rem; 
+    border-radius: 12px; 
     cursor: pointer;
     font-family: 'Inter', sans-serif;
+    transition: all 0.2s ease;
+}
+
+button.secondary {
+    background-color: #333;
+}
+
+button:hover {
+    background-color: #f51621;
+    transform: translateY(-1px);
+}
+
+button.secondary:hover {
+    background-color: #444;
+}
+
+button:active {
+    transform: translateY(0);
 }
 
 select, input, textarea {
@@ -91,20 +109,20 @@ select, select option {
 }
 
 .popup .content {
-    padding: 1rem 1.5rem;
-    border-radius: 10px;
+    padding: 1.5rem 2rem;
+    border-radius: 24px;
     width: 90%;
     max-width: 500px;
     box-sizing: border-box;
     font-size: 1rem;
     display: flex;
     flex-direction: column;
-    background: rgb(17, 17, 17);
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0)), rgb(17, 17, 17);
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    background: rgb(25, 25, 25);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.02)), rgb(25, 25, 25);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 12px 48px 0 rgba(0, 0, 0, 0.45);
     color: white;
+    backdrop-filter: blur(10px);
 }
 
 .popup .option {
@@ -153,13 +171,21 @@ span.edit {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    padding: 12px 16px;
+    margin: -8px -16px;
+    border-radius: 12px;
+    transition: background-color 0.2s ease;
+}
+
+.popup .row:hover {
+    background-color: rgba(255, 255, 255, 0.05);
 }
 
 .popup .switch {
-  position: relative;
-  display: inline-block;
-  width: 44px;
-  height: 24px;
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 26px;
 }
 
 .popup .switch input {
@@ -167,32 +193,34 @@ span.edit {
 }
 
 .popup .switch .slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0; left: 0; right: 0; bottom: 0;
-  border-radius: 24px;
-  transition: 300ms;
-  background: rgba(255, 255, 255, 0.2);
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    border-radius: 34px;
+    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .popup .switch :before {
-  position: absolute;
-  content: "";
-  height: 18px; 
-  width: 18px;
-  left: 3px;
-  bottom: 3px;
-  border-radius: 50%;
-  transition: 300ms;
-  background: #dddddd;
+    position: absolute;
+    content: "";
+    height: 20px; 
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    border-radius: 50%;
+    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .popup .switch input:checked + .slider:before {
-  transform: translateX(20px);
+    transform: translateX(22px);
+    background: white;
 }
 
 .popup .switch input:checked + .slider {
-  background: rgb(227, 28, 35);
+    background: #e50813;
 }
 
 #map {

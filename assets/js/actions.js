@@ -70,7 +70,7 @@ const actions = {
                 console.log("User has returned to the page. Ready to request feedback about this location.");
                 await sleep(1000);
 
-                document.body.insertAdjacentHTML('afterbegin', "<div id=kioskFeedback class=popup><div class=content><h1 style=margin-top:5px;margin-bottom:15px>Confirm Status?</h1><p style=margin-top:0;line-height:24px>Would you like to take a moment to provide feedback on whether the machine is operational? Your input will help others locate functional machines in the area.<div class=option><button class=close style=background:#333;margin-right:10px>No thanks.</button><button class=continue>Continue</button></div><div class=timer-bar><div style='animation: fillBar 5s linear forwards;' class=timer-fill></div></div></div></div>");
+                document.body.insertAdjacentHTML('afterbegin', "<div id=kioskFeedback class=popup><div class=content><h1 style=margin-top:5px;margin-bottom:15px>Confirm Status?</h1><p style=margin-top:0;line-height:24px>Would you like to take a moment to provide feedback on whether the machine is operational? Your input will help others locate functional machines in the area.<div class=option><button class='close secondary' style=margin-right:10px>No thanks.</button><button class=continue>Continue</button></div><div class=timer-bar><div style='animation: fillBar 5s linear forwards;' class=timer-fill></div></div></div></div>");
                 document.getElementById('kioskFeedback').offsetWidth
                 $('#kioskFeedback').addClass('show');
 
@@ -84,7 +84,7 @@ const actions = {
 
                 // if they come back, ask them about their feedback (of the location)
                 $('#kioskFeedback .continue').click(async function () {
-                    $('#kioskFeedback').html("<div style=display:none; class=content><h1 style=margin-top:5px;margin-bottom:15px>What Happened?</h1><p style=margin-top:0;line-height:24px>Does this kiosk still work as expected? Your feedback will help hundreds of others find a working Redbox!<div class=option><button class=disagree style=background:#333;margin-right:10px>Somethings up.</button><button class=agree>It works!</button></div><div class=timer-bar><div style='animation: fillBar 10s linear forwards;' class=timer-fill></div></div></div>");
+                    $('#kioskFeedback').html("<div style=display:none; class=content><h1 style=margin-top:5px;margin-bottom:15px>What Happened?</h1><p style=margin-top:0;line-height:24px>Does this kiosk still work as expected? Your feedback will help hundreds of others find a working Redbox!<div class=option><button class='disagree secondary' style=margin-right:10px>Somethings up.</button><button class=agree>It works!</button></div><div class=timer-bar><div style='animation: fillBar 10s linear forwards;' class=timer-fill></div></div></div>");
 
                     $('#kioskFeedback .content').fadeIn(200);
                     return actions.handleFeedback(storeId, $('#kioskFeedback')); // handle the feedback
@@ -114,7 +114,7 @@ const actions = {
                         </select>
                         <textarea class=notes placeholder="Additional notes..." style="margin-top: 10px; width: 75%; resize: none;">${oldData?.notes?.replace("\n!!!RBConfirmedOperational!!!", "") || ''}</textarea>
                         <div class="option">
-                            <button class="cancel" style="background:#333;margin-right:10px">Cancel</button>
+                            <button class="cancel secondary" style="margin-right:10px">Cancel</button>
                             <button class="submit">Submit</button>
                         </div>
                     </div>
