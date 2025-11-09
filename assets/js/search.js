@@ -76,7 +76,7 @@ $(document).ready(function () {
 
                 $('.search-results .locations').append(`
                 <div class="location">
-                    <h3>${result.properties.bannerName} - <span style="color:${settings.color(storeStatus).text};">${storeStatus}</span></h3>
+                    <h3>${result.properties.bannerName} - <span style="color:${settings.color[storeStatus].text};">${storeStatus}</span></h3>
                     <p>${result.properties.address}</p>
                     <p>Opening Date: ${result.properties.openDate}</p>
                     <p><a class="get-directions">Get Directions</a> ${userCoords ? '<span style="color: grey;">(~' + getDistance(userCoords.latitude, userCoords.longitude, result.geometry.coordinates[1], result.geometry.coordinates[0]).toFixed(1) + ' miles)</span>' : ''}</p>

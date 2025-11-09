@@ -21,8 +21,8 @@ const actions = {
 
         try {
             const popupEl = $('.mapboxgl-popup');
-            const color = settings.color(updatedData.status);
             map.setFeatureState({ source: 'storeSource', id: storeId }, { color: color.marker }); // update the marker color
+            const color = settings.color[updatedData.status];
             let notes = updatedData?.notes?.replace("\n!!!RBConfirmedOperational!!!", "") || null;
 
             if (popupEl && popupEl.attr('data-id') === storeId) { // if the popup is open, update the status and notes

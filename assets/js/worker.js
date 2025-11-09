@@ -27,7 +27,7 @@ function createGeoJSON(stores) {
                 bannerName: kiosk.banner_name || 'Unknown',
                 address: kiosk.address,
                 openDate: kiosk.open_date ? new Date(kiosk.open_date).toLocaleDateString() : 'Unknown',
-                color: settings.color(((kiosk.status === 'Operational' && !kiosk.notes) ? 'Unconfirmed' : kiosk.status), 'marker').marker,
+                color: settings.color[(kiosk.status === 'Operational' && !kiosk.notes) ? 'Unconfirmed' : kiosk.status].marker,
 
                 // we need to make a deep copy since geometry changes over time based on map movement
                 lng: parseFloat(kiosk.lon),
