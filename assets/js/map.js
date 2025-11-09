@@ -112,25 +112,6 @@ async function servePopup(feature, lngLat, index = null) {
     // If there are multiple kiosks at this location and no specific kiosk is selected, show the selection modal
     if (kiosks.length > 1 && index === null) {
         document.body.insertAdjacentHTML('afterbegin', `
-            <div id="settingsModal" class="popup" style="display: none; padding: 5px;">
-                <div class="content">
-                    <h1 style="margin-top: 0px; margin-bottom: 20px;">Multiple Kiosks</h1>
-
-                    <div class="row" style="margin-bottom: 18px;">
-                        <span>Show unknown opening date</span>
-
-                        <label class="switch">
-                            <input type="checkbox" id="showUnknownDate">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-
-                    <div class="option" style="margin-top: 20px;">
-                        <button onclick="closeSettings()">Close</button>
-                    </div>
-                </div>
-            </div>
-
             <div id="kioskSelector" class="popup">
                 <div class="content">
                     <h1 style="margin-top:5px;margin-bottom:15px">Multiple Kiosks Found</h1>
@@ -155,7 +136,7 @@ async function servePopup(feature, lngLat, index = null) {
             $('#kioskSelector').removeClass('show');
             await sleep(200);
             $('#kioskSelector').remove();
-            
+
             servePopup(feature, lngLat, Number($(this).attr('index')));
         });
 
