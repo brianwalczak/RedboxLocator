@@ -180,24 +180,3 @@ $(document).ready(function () {
 
     $('.draggable-area').on('mousedown touchstart', startTracking);
 });
-
-const checkMapReady = setInterval(() => {
-    if (map) { // When map is no longer null
-        clearInterval(checkMapReady);
-
-        map.on('zoom' && 'move', function () {
-            if ($('.search-results').hasClass('visible')) {
-                $('.search-results').height($(window).height() * 0.33);
-            }
-        });
-
-        // wait until the store data was loaded onto the map
-        const checkSourceReady = setInterval(() => {
-            if (map.getSource('storeSource')) {
-                clearInterval(checkSourceReady);
-
-                $('.search-container').show(); // show the search bar
-            }
-        }, 100); // poll every 100ms
-    }
-}, 100); // poll every 100ms
