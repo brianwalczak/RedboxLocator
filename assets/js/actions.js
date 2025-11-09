@@ -62,6 +62,8 @@ const actions = {
         }
     },
     userFeedback: async function (storeId) {
+        if (!!localStorage.getItem('suppressFeedback')) return;
+
         // the user will leave the page so wait until they come back
         console.log("User requested directions for store, waiting for them to return...");
 

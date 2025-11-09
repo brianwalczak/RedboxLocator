@@ -136,6 +136,7 @@ function viewSettings() {
   $('#settingsModal').addClass('show');
 
   $('#showUnknownDate').prop('checked', !!localStorage.getItem('showUnknownDate'));
+  $('#suppressFeedback').prop('checked', !!localStorage.getItem('suppressFeedback'));
 }
 
 async function closeSettings() {
@@ -153,5 +154,13 @@ $(document).on('change', '#showUnknownDate', function () {
 
   if (map) {
     map.setFilter('storeLayer', this.checked ? null : ['!=', ['get', 'unknownDates'], true]);
+  }
+});
+
+$(document).on('change', '#suppressFeedback', function () {
+  if (this.checked) {
+    localStorage.setItem('suppressFeedback', 'true');
+  } else {
+    localStorage.removeItem('suppressFeedback');
   }
 });
