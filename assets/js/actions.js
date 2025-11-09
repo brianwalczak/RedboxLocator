@@ -21,14 +21,15 @@ const actions = {
 
         try {
             const popupEl = $('.mapboxgl-popup');
-            map.setFeatureState({ source: 'storeSource', id: storeId }, { color: settings.color(updatedData.status, 'marker') }); // update the marker color
+            const color = settings.color(updatedData.status);
+            map.setFeatureState({ source: 'storeSource', id: storeId }, { color: color.marker }); // update the marker color
             let notes = updatedData?.notes?.replace("\n!!!RBConfirmedOperational!!!", "") || null;
 
             if (popupEl && popupEl.attr('data-id') === storeId) { // if the popup is open, update the status and notes
                 $(popupEl).find('.status').text(updatedData.status);
                 $(popupEl).find('.notes').html(notes ? `<b>Notes: </b>${notes}<br><br>` : '');
 
-                $(popupEl).find('.status').css('color', settings.color(updatedData.status, 'text')); // change the text color to match the status color
+                $(popupEl).find('.status').css('color', color.text); // change the text color to match the status color
             }
 
             return true;

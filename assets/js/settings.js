@@ -64,46 +64,55 @@ const settings = {
     },
 
     // get the correct color for a status
-    color: function (status, type) {
+    color: function (status) {
         let markerColor;
         let textColor;
+        let rank;
 
         switch (status) {
             case 'Operational':
                 markerColor = 'green';
                 textColor = 'green';
+                rank = 6;
                 break;
             case 'Turned Off':
                 markerColor = 'rgb(255, 193, 7)';
                 textColor = '#FFC107';
+                rank = 5;
                 break;
             case 'Removed':
                 markerColor = 'rgb(227, 28, 35)';
                 textColor = 'red';
+                rank = 3;
                 break;
             case 'Error (See notes for error code)':
                 markerColor = 'rgb(255, 193, 7)';
                 textColor = 'red';
+                rank = 4;
                 break;
             case 'Never Existed':
                 markerColor = 'darkgrey';
                 textColor = 'red';
+                rank = 1;
                 break;
             case 'Unconfirmed':
                 markerColor = 'darkgrey';
                 textColor = 'darkgrey';
+                rank = 2;
                 break;
         }
 
-        return type == 'marker' ? markerColor : type == 'text' ? textColor : { marker: markerColor, text: textColor };
+        return { marker: markerColor, text: textColor, rank: rank };
     },
 
     prioritize: function () {
         return [
-            ['==', ['get', 'color'], this.color('Operational', 'marker')], 4,
-            ['==', ['get', 'color'], this.color('Turned Off', 'marker')], 3,
-            ['==', ['get', 'color'], this.color('Removed', 'marker')], 2,
-            ['==', ['get', 'color'], this.color('Unconfirmed', 'marker')], 1,
+            ['==', ['get', 'color'], this.color('Operational').marker], 6,
+            ['==', ['get', 'color'], this.color('Turned Off').marker], 5,
+            ['==', ['get', 'color'], this.color('Error (See notes for error code)').marker], 4,
+            ['==', ['get', 'color'], this.color('Removed').marker], 3,
+            ['==', ['get', 'color'], this.color('Unconfirmed').marker], 2,
+            ['==', ['get', 'color'], this.color('Never Existed').marker], 1,
         ]
     }
 };
