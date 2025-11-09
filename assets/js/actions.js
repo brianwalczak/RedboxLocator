@@ -16,7 +16,7 @@ const actions = {
             return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`; // for androids and other devices
         }
     },
-    updateMarker: function (storeId, color) {
+    updateMarker: function (storeId) {
         const feature = map.getSource('storeSource')._data.features.find(feature => {
             return feature.properties.kiosks.find(kiosk => {
                 return kiosk.id == storeId;
@@ -38,18 +38,18 @@ const actions = {
             map.setFeatureState({ source: 'storeSource', id: feature.properties.id }, { color: colors[0].marker });
         }
     },
-    propogateChanges: function (storeId, updatedData = null) {
-        if (!updatedData) updatedData = window.cache[storeId];
+    propogateChanges: function (storeId) {
+        const cache = window.cache[storeId];
 
         try {
             const popupEl = $('.mapboxgl-popup');
-            const color = settings.color[updatedData.status];
-            let notes = updatedData?.notes?.replace("\n!!!RBConfirmedOperational!!!", "") || null;
+            const color = settings.color[cache.status];
+            let notes = cache?.notes?.replace("\n!!!RBConfirmedOperational!!!", "") || null;
 
             actions.updateMarker(storeId); // update the marker color
 
             if (popupEl && popupEl.attr('data-id') === storeId) { // if the popup is open, update the status and notes
-                $(popupEl).find('.status').text(updatedData.status);
+                $(popupEl).find('.status').text(cache.status);
                 $(popupEl).find('.notes').html(notes ? `<b>Notes: </b>${notes}<br><br>` : '');
 
                 $(popupEl).find('.status').css('color', color.text); // change the text color to match the status color

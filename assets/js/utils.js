@@ -135,7 +135,7 @@ function viewSettings() {
   $('#settingsModal').show();
   $('#settingsModal').addClass('show');
 
-  $('#showUnknownDate').prop('checked', !!settings.get('showUnknownDate'));
+  $('#showUnknownDate').prop('checked', !!localStorage.getItem('showUnknownDate'));
 }
 
 async function closeSettings() {
@@ -145,7 +145,11 @@ async function closeSettings() {
 }
 
 $(document).on('change', '#showUnknownDate', function () {
-  settings.set('showUnknownDate', this.checked);
+  if (this.checked) {
+    localStorage.setItem('showUnknownDate', 'true');
+  } else {
+    localStorage.removeItem('showUnknownDate');
+  }
 
   if (map) {
     map.setFilter('storeLayer', this.checked ? null : ['!=', ['get', 'unknownDates'], true]);

@@ -7,63 +7,6 @@
 */
 
 const settings = {
-    // get the settings from local storage
-    get: function (value = null) {
-        const getSettings = localStorage.getItem('settings');
-        let result = {};
-
-        if (getSettings) {
-            try {
-                result = JSON.parse(getSettings);
-            } catch (error) {
-                result = {}; // keep empty
-            }
-        }
-
-        if (value) {
-            return result[value] || null;
-        } else {
-            return result;
-        }
-    },
-
-    // set the settings in local storage
-    set: function (key, value) {
-        const getSettings = localStorage.getItem('settings');
-        let result = {};
-
-        if (getSettings) {
-            try {
-                result = JSON.parse(getSettings);
-            } catch (error) {
-                result = {}; // keep empty
-            }
-        }
-
-        result[key] = value;
-        localStorage.setItem('settings', JSON.stringify(result));
-        return result;
-    },
-
-    // delete a setting from local storage
-    del: function (key = null) {
-        if (!key) {
-            localStorage.removeItem('settings');
-            return {};
-        }
-
-        let result = settings.get();
-        try {
-            delete result[key];
-        } catch (error) {
-            return result;
-        }
-
-        localStorage.setItem('settings', JSON.stringify(result));
-        return result;
-    },
-
-    // get the correct color for a status
     color: {
         'Operational': { marker: 'green', text: 'green', rank: 6 },
         'Turned Off': { marker: 'rgb(255, 193, 7)', text: '#FFC107', rank: 5 },

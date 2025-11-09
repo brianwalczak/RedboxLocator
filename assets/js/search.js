@@ -45,7 +45,7 @@ $(document).ready(function () {
 
         let searchResults = map.getSource('storeSource')._data.features.filter(feature => {
             return feature.properties.kiosks.some(kiosk => {
-                if (!kiosk.openDate && !settings.get('showUnknownDate')) return false;
+                if (!kiosk.openDate && !localStorage.getItem('showUnknownDate')) return false;
 
                 return (kiosk.bannerName && kiosk.bannerName.toLowerCase().includes($('.search-input').val().toLowerCase()));
             });
@@ -67,7 +67,7 @@ $(document).ready(function () {
 
             newResults.forEach(result => {
                 result.properties.kiosks.forEach(kiosk => {
-                    if (!kiosk.openDate && !settings.get('showUnknownDate')) return; // skip if we aren't showing unknown dates
+                    if (!kiosk.openDate && !localStorage.getItem('showUnknownDate')) return; // skip if we aren't showing unknown dates
                     const storeStatus = window.cache[kiosk.id].status;
 
                     $('.search-results .locations').append(`

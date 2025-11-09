@@ -169,7 +169,7 @@ async function downloadClusters() {
                 id: 'storeLayer',
                 type: 'circle',
                 source: 'storeSource',
-                filter: (settings.get('showUnknownDate') ? null : ['!=', ['get', 'unknownDates'], true]),
+                filter: (!!localStorage.getItem('showUnknownDate') ? null : ['!=', ['get', 'unknownDates'], true]),
                 layout: {
                     'circle-sort-key': [
                         'case',
